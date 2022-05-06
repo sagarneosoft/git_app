@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:github_user_listing_demo/features/user_listing/display/pages/listing_page.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:github_user_listing_demo/core/bloc/cubit/navigation_cubit.dart';
+import 'package:github_user_listing_demo/core/utils/network/observer/simple_bloc_observer.dart';
+import 'package:github_user_listing_demo/features/user_listing/display/bloc/user_local_listing/bloc/local_listing_bloc.dart';
+import 'package:github_user_listing_demo/features/user_listing/display/bloc/user_remote_listing/bloc/listing_bloc.dart';
 import 'package:github_user_listing_demo/main/main_page.dart';
-import 'package:github_user_listing_demo/core/providers/navigation_provider.dart';
-import 'package:github_user_listing_demo/features/user_listing/display/providers/user_provider.dart';
-import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  BlocOverrides.runZoned(
+    () => runApp(const MyApp()),
+    blocObserver: SimpleBlocObserver(),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -14,15 +18,23 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(providers: [
-      ChangeNotifierProvider(create: (context)=> UserProvider()),
-      ChangeNotifierProvider(create: (context)=> NavigationProvider()),
-
-    ],
-    child: const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: MainPage(),
-    ),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<ListingBloc>(
+          create: (BuildContext context) => ListingBloc(const UserState()),
+        ),
+        BlocProvider<LocalListingBloc>(
+          create: (BuildContext context) =>
+              LocalListingBloc(LocalListingState.initial()),
+        ),
+        BlocProvider(
+          create: (context) => NavigationCubit(),
+        )
+      ],
+      child: const MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: MainPage(),
+      ),
     );
   }
 }

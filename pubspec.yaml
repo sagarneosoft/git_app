@@ -42,6 +42,10 @@ dependencies:
   riverpod:
   cached_network_image:
   floor:
+  flutter_bloc:
+  equatable:
+  bloc_concurrency:
+  stream_transform:
 
 dev_dependencies:
   flutter_test:
